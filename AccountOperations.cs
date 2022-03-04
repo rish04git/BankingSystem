@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BankingSystem;
 
 namespace BankingSystem
 {
     public static class AccountOperations
     {
+        public static IBankAccount CurrentAccount { get; } = new CheckingAccount();
+        public static IBankAccount SavingsAccount { get; } = new SavingAccount();
+
         public static void SetupAnAccount(ref User user, char accountType)
         {
             if (accountType.Equals('C'))
             {
-                IBankAccount currentAccount = new CheckingAccount();
-                currentAccount.CreateAccount(user);
+                CurrentAccount.CreateAccount(user);
             }
             else if (accountType.Equals('S'))
             {
-                IBankAccount savingAccount = new SavingAccount();
-                savingAccount.CreateAccount(user);
+                SavingsAccount.CreateAccount(user);
             }
             else
             {
@@ -27,89 +23,58 @@ namespace BankingSystem
             }
 
             Console.WriteLine("Bank Account Created Successfully!");
-
-            Console.ReadLine();
         }
 
-        public static decimal GetAccountBalance(List<User> customerList, out bool isAccount)
+        public static void DepositToYourAccount(ref User userAccount, decimal amount, char accounttType)
         {
-            Console.WriteLine("Enter your User Id.");
-            var id = int.Parse(Console.ReadLine());
-            decimal balance = 0;
-            isAccount = false;
-            foreach (var userAccount in customerList.Where(userAccount => userAccount.UserId == id))
+            if (accounttType.Equals('C'))
             {
-                isAccount = true;
-                Console.WriteLine("Account Found!\nName: {0}\nBalance: {1}", userAccount.UserId, userAccount.GetAccountBalance);
-                balance =  userAccount.GetAccountBalance;
+                CurrentAccount.Deposit(amount, userAccount);
+                
             }
-
-            return balance;
+            else if (accounttType.Equals('S'))
+            {
+                SavingsAccount.Deposit(amount, userAccount);
+                
+            }
         }
 
-        public static void DepositToYourAccount(List<User> customerList, IBankAccount currentAccount, IBankAccount savingAccount)
+        public static void WithdrawBalance(ref User userAccount, decimal amount, char accounttType)
         {
-            Console.Write("Enter your user ID: ");
-            var userId = int.Parse(Console.ReadLine());
-            var checkId = false;
-
-            foreach (var userAccount in customerList.Where(userAccount => userAccount.UserId == userId))
+            switch (accounttType)
             {
-                checkId = true;
-                Console.Write("Enter the Account Type to deposit (C/S): ");
-                var accountType = Convert.ToChar(Console.ReadLine().ToUpper());
-
-                Console.Write("Enter the amount to be deposited : ");
-
-                var amount = decimal.Parse(Console.ReadLine());
-
-                if (userAccount.AccountType == accountType)
+                case 'C':
                 {
-                    currentAccount.Withdraw(amount, userAccount);
+                    CurrentAccount.Withdraw(amount, userAccount);
+                    Console.WriteLine("Amount Withdrawn from your Current Account");
+                    break;
                 }
-                else
+                case 'S':
                 {
-                    savingAccount.Deposit(amount, userAccount);
-
+                    SavingsAccount.Withdraw(amount, userAccount);
+                    Console.WriteLine("Amount Withdrawn from your Current Account");
+                    break;
                 }
-            }
-
-            if (checkId == false)
-            {
-                Console.WriteLine("No such User id exists.");
             }
         }
 
-        public static void WithdrawBalance(List<User> customerList, IBankAccount currentAccount, IBankAccount savingAccount)
+        public static void CheckBalance(ref User account, char accounttType)
         {
-            Console.Write("Enter your user ID: ");
-            var userID = int.Parse(Console.ReadLine());
-            bool checkUId = false;
-
-            foreach (var userAccount in customerList.Where(userAccount => userAccount.UserId == userID))
+            switch (accounttType)
             {
-                checkUId = true;
-                Console.Write("Enter the Account Type to withdraw (C/S): ");
-                var accountType = Convert.ToChar(Console.ReadLine().ToUpper());
-
-                Console.Write("Enter the amount to be withdrawn : ");
-
-                var amount = decimal.Parse(Console.ReadLine());
-                if (userAccount.AccountType == accountType)
+                case 'C':
                 {
-                    currentAccount.Withdraw(amount, userAccount);
-                }
-                else
-                {
-                    savingAccount.Withdraw(amount, userAccount);
-                }
-            }
+                    Console.WriteLine($"Your Current Account Balance is {CurrentAccount.Balance}");
 
-            if (checkUId == false)
-            {
-                Console.WriteLine("No such User id exists.");
+                    break;
+                }
+                case 'S':
+                {
+                   Console.WriteLine($"Your Current Account Balance is {SavingsAccount.Balance}");
+
+                    break;
+                }
             }
         }
-
     }
 }

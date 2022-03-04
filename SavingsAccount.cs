@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using BankingSystem;
 
 namespace BankingSystem
 {
@@ -27,14 +21,17 @@ namespace BankingSystem
         private decimal _dailyLimit;
         public bool Deposit(decimal amount, User user)
         {
-            if (amount > 10000)
+            if (amount > 10000 || amount < 0)
             {
-                Console.WriteLine($"Cannot deposit {amount} to your account at one time.");
+                Console.WriteLine($"Cannot deposit {amount} to your account at one time. Please Enter a valid amount.");
+                return false;
             }
 
             _balance += amount;
 
             user.GetAccountBalance = _balance;
+
+            Console.WriteLine("Amount Deposited to your Savings Account");
 
             return true;
         }
@@ -47,7 +44,7 @@ namespace BankingSystem
                 return false;
             }
 
-            if (amount > (decimal)(0.9 * (double)(_dailyLimit+amount)) || _dailyLimit + amount < 100)
+            if (amount > (decimal)(0.9 * (double)(_dailyLimit+Balance)) || _dailyLimit + amount > 100)
             {
                 Console.WriteLine("Withdrawal attempt failed. Please enter a Valid withdrawal amount!");
                 return false;

@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using BankingSystem;
 
 namespace BankingSystem
 {
@@ -13,8 +9,6 @@ namespace BankingSystem
         static void Main(string[] args)
         {
             var accounts = new List<User>();
-            IBankAccount currentAccount = new CheckingAccount();
-            IBankAccount savingAccount = new SavingAccount();
 
 
             while (true)
@@ -29,6 +23,8 @@ namespace BankingSystem
 
                 Console.WriteLine("\n");
 
+                int userId;
+                bool checkId;
                 switch (options)
                 {
                     case "1":
@@ -38,10 +34,10 @@ namespace BankingSystem
                         var id = int.Parse(Console.ReadLine());
 
                         Console.WriteLine("Enter your FirstName: ");
-                        var firstName = Console.ReadLine();
+                        string firstName = Console.ReadLine();
 
                         Console.WriteLine("Enter your LastName: ");
-                        var lastName = Console.ReadLine();
+                        string lastName = Console.ReadLine();
 
                         Console.WriteLine("Enter your Mail id: ");
                         var mailId = Console.ReadLine();
@@ -55,26 +51,95 @@ namespace BankingSystem
                         var accountType = Convert.ToChar(Console.ReadLine().ToUpper());
 
                         AccountOperations.SetupAnAccount(ref customer, accountType);
+
                         accounts.Add(customer);
+
                         break;
 
                     case "2":
-                        AccountOperations.GetAccountBalance(accounts , out bool isAccount);
-                        if (!isAccount)
+
+                        Console.Write("Enter your user ID: ");
+
+                        userId = int.Parse(Console.ReadLine());
+
+                        checkId = false;
+
+                        foreach (var userAccount in accounts.Where(userAccount => userAccount.UserId == userId))
                         {
-                            Console.WriteLine("User Account doesn't exist!");
+                            checkId = true;
+
+                            Console.Write("Enter the Account Type to check you balance (C/S): ");
+
+                            var accounttType = Convert.ToChar(Console.ReadLine().ToUpper());
+
+                            var account = userAccount;
+
+                            AccountOperations.CheckBalance(ref account, accounttType);
+                        }
+
+                        if (checkId == false)
+                        {
+                            Console.WriteLine(" No user Account exists for this user. Please setup your account!");
                         }
 
                         break;
 
                     case "3":
-                        AccountOperations.DepositToYourAccount(accounts, currentAccount, savingAccount);
+
+                        Console.Write("Enter your user ID: ");
+
+                        userId = int.Parse(Console.ReadLine());
+
+                        checkId = false;
+
+                        foreach (var userAccount in accounts.Where(userAccount => userAccount.UserId == userId))
+                        {
+                            checkId = true;
+
+                            Console.Write("Enter the Account Type to deposit (C/S): ");
+
+                            var accounttType = Convert.ToChar(Console.ReadLine().ToUpper());
+
+                            Console.Write("Enter the amount to be deposited : ");
+
+                            var amount = decimal.Parse(Console.ReadLine());
+
+                            var account = userAccount;
+
+                            AccountOperations.DepositToYourAccount(ref account, amount, accounttType);
+                        }
+
+                        if (checkId == false)
+                        {
+                            Console.WriteLine(" No user Account exists for this user. Please setup your account!");
+                        }
+
                         Console.WriteLine();
 
                         break;
 
                     case "4":
-                        AccountOperations.WithdrawBalance(accounts, currentAccount, savingAccount);
+                        Console.Write("Enter your user ID: ");
+                        var userID = int.Parse(Console.ReadLine());
+                        bool checkUId = false;
+
+                        foreach (var userAccount in accounts.Where(userAccount => userAccount.UserId == userID))
+                        {
+                            checkUId = true;
+                            Console.Write("Enter the Account Type to withdraw (C/S): ");
+                            var accountsType = Convert.ToChar(Console.ReadLine().ToUpper());
+
+                            Console.Write("Enter the amount to be withdrawn : ");
+
+                            var amount = decimal.Parse(Console.ReadLine());
+                            var account = userAccount;
+                            AccountOperations.WithdrawBalance(ref account, amount, accountsType);
+                        }
+
+                        if (checkUId == false)
+                        {
+                            Console.WriteLine("No such User id exists.");
+                        }
 
                         Console.WriteLine();
 

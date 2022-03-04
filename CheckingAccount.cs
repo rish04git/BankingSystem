@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BankingSystem
 {
@@ -26,9 +22,17 @@ namespace BankingSystem
 
         public bool Deposit(decimal amount, User user)
         {
+            if (amount > 10000 || amount < 0)
+            {
+                Console.WriteLine($"Cannot deposit {amount} to your account at one time. Please Enter a valid amount.");
+                return false;
+            }
+
             _balance += amount;
 
             user.GetAccountBalance = _balance;
+
+            Console.WriteLine("Amount Deposited to your Current Account");
 
             return true;
         }
@@ -40,7 +44,7 @@ namespace BankingSystem
                 return false;
             }
 
-            if (amount > (decimal)(0.9 * (double)amount) ||  amount < 100)
+            if (amount > (decimal)(0.9 * (double)Balance) ||  amount > 100)
             {
                 Console.WriteLine("Withdrawal attempt failed. Please enter a Valid withdrawal amount!");
                 return false;
@@ -50,7 +54,7 @@ namespace BankingSystem
                 _balance -= amount;
                 user.GetAccountBalance = _balance;
 
-                Console.WriteLine($"Successfully withdraw: {amount,6:C}");
+                Console.WriteLine($"Successfully withdrawn: {amount,6:C}");
 
                 return true;
             }
