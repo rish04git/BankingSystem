@@ -1,14 +1,12 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using BankingSystem;
+﻿using BankingSystem;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 namespace BankingSystemTest
 {
     /// <summary>
-    /// Summary description for UnitTest1
+    /// Summary description for Banking Unit Tests.
     /// </summary>
     [TestClass]
     public class BankingSystemTest
@@ -40,10 +38,6 @@ namespace BankingSystemTest
             mockRepository.Setup(x => x.CreateAccount(new User(11, "xxx", "ppp", "ll@gmail.com", 97662990)));
 
             // Act
-            //IBankAccount currentAccount = new CheckingAccount();
-            //var user = new User(11, "any", "ppp", "any@gmail.com", 97662990);
-            //currentAccount.CreateAccount(user);
-
             var controller = new SavingAccount(mockRepository.Object);
             var user = new User(11, "any", "ppp", "any@gmail.com", 97662990);
             controller.CreateAccount(user);
@@ -54,7 +48,7 @@ namespace BankingSystemTest
             Assert.AreEqual('S', user.UserAccount[0].AccountType);
         }
 
-        
+
         [TestMethod]
         public void SetupAccount_WhenPassedValidDetails_ShouldCreateUserAccount()
         {
@@ -97,6 +91,52 @@ namespace BankingSystemTest
         }
 
         [TestMethod]
+        public void DepositToYourAccount_WhenProvidedWithUserDetailsAndDepositAmountIsGreaterThanDailyLimit_ShouldNotDepositToUserAccount()
+        {
+            // Arrange
+
+            var mockRepository = new Mock<IBankAccount>();
+            mockRepository.Setup(x => x.Balance).Returns(100);
+
+            // Act
+
+            var controller = new CheckingAccount(mockRepository.Object);
+            var user = new User(11, "any", "ppp", "any@gmail.com", 97662990);
+            controller.CreateAccount(user);
+
+            controller.Deposit(100001, user);
+
+            var bal = controller.Balance;
+
+            // Assert
+            Assert.IsNotNull(user.GetAccountBalance);
+            Assert.AreEqual(0, bal);
+        }
+
+        [TestMethod]
+        public void DepositToYourAccount_WhenProvidedWithUserDetailsAndDepositAmountIsNegative_ShouldNotDepositToUserAccount()
+        {
+            // Arrange
+
+            var mockRepository = new Mock<IBankAccount>();
+            mockRepository.Setup(x => x.Balance).Returns(100);
+
+            // Act
+
+            var controller = new CheckingAccount(mockRepository.Object);
+            var user = new User(11, "any", "ppp", "any@gmail.com", 97662990);
+            controller.CreateAccount(user);
+
+            controller.Deposit(-11, user);
+
+            var bal = controller.Balance;
+
+            // Assert
+            Assert.IsNotNull(user.GetAccountBalance);
+            Assert.AreEqual(0, bal);
+        }
+
+        [TestMethod]
         public void WithdrawBalance_WhenAccountContainsOnlyHundredDollars_ShouldNotWithdrawBalanceLessThanLimit()
         {
             // Arrange
@@ -119,6 +159,20 @@ namespace BankingSystemTest
         }
 
         [TestMethod]
+        public void WithDrawAmountFromAccount_WhenProvidedWithValidDetails_ShouldWithdrawRequestedAmount()
+        {
+            // Arrange
+
+            var user = new User(99, "yui", "dds", "aihhuy@rediff.com", 97662990);
+            var accountType = 'S';
+
+            // Act
+            AccountOperations.WithdrawBalance(ref user, 100, accountType);
+
+            // Assert
+        }
+
+        [TestMethod]
         public void WithdrawBalance_WhenAccountContainsOnlyThousandDollarsAndWithdrawalAmountIsMoreThanNinetyPercent_ShouldNotBeWithdrawn()
         {
             // Arrange
@@ -138,6 +192,52 @@ namespace BankingSystemTest
             // Assert
             Assert.IsNotNull(user.GetAccountBalance);
             Assert.AreEqual(1000, controller.Balance);
+        }
+
+        [TestMethod]
+        public void SetupCheckingAccount_WhenProvidedWithUserDetailsAndAccountType_ShouldSetupUserAccount()
+        {
+            // Arrange
+
+            var user = new User(11, "dha", "skkk", "aiy@yahoo.com", 97662990);
+            var accountType = 'C';
+
+            // Act
+            AccountOperations.SetupAnAccount(ref user, accountType);
+
+            // Assert
+            Assert.IsNotNull(user.UserAccount[0].AccountNo);
+            Assert.AreEqual('C', user.UserAccount[0].AccountType);
+        }
+
+        [TestMethod]
+        public void SetupSavingsAccount_WhenProvidedWithUserDetailsAndAccountType_ShouldSetupUserAccount()
+        {
+            // Arrange
+
+            var user = new User(99, "yui", "dds", "aihhuy@rediff.com", 97662990);
+            var accountType = 'S';
+
+            // Act
+            AccountOperations.SetupAnAccount(ref user, accountType);
+
+            // Assert
+            Assert.IsNotNull(user.UserAccount[0].AccountNo);
+            Assert.AreEqual('S', user.UserAccount[0].AccountType);
+        }
+
+        [TestMethod]
+        public void DepositToYourCurrentAccount_WhenProvidedWithUserDetails_ShouldDepositIFProvidedAmountIsInLimit()
+        {
+            // Arrange
+
+            var user = new User(99, "yui", "dds", "aihhuy@rediff.com", 97662990);
+            var accountType = 'C';
+
+            // Act
+            AccountOperations.DepositToYourAccount(ref user, 1000, 'C');
+
+            // Assert
         }
     }
 }
